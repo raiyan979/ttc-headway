@@ -1,0 +1,37 @@
+name: poll
+
+# One collection cycle per run. The schedule is commented out until R2 secrets
+# exist — a scheduled run without them would poll the feed and then discard the
+# data on the ephemeral runner, burning minutes for nothing. Uncomment to begin
+# the collection window.
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+
+# Never let a late scheduled run and an on-time one write the same slot at once.
+concurrency:
+  group: poll
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@ae62891fec2bb8e7d6c99fc78c9fec3a63790f8d # v10.0.0
+        with:
+          enable-cache: true
+      - name: Install (locked, runtime only)
+        run: uv sync --locked --no-dev
+      - name: Collect one cycle
+        env:
+          TTC_R2_BUCKET: ${{ secrets.TTC_R2_BUCKET }}
+          TTC_R2_ENDPOINT_URL: ${{ secrets.TTC_R2_ENDPOINT_URL }}
+          TTC_R2_ACCESS_KEY_ID: ${{ secrets.TTC_R2_ACCESS_KEY_ID }}
+          TTC_R2_SECRET_ACCESS_KEY: ${{ secrets.TTC_R2_SECRET_ACCESS_KEY }}
+        run: uv run python -m ttc_headway.poll
