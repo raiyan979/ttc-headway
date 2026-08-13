@@ -1,0 +1,33 @@
+[project]
+name = "ttc-headway"
+version = "0.1.0"
+description = "Headway adherence and bunching on TTC streetcar routes, from the public GTFS-Realtime feed."
+readme = "README.md"
+authors = [
+    { name = "Raiyan Mirza", email = "rayan.rambo1233@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic-settings>=2.5",
+    "requests>=2.32",
+    "pyarrow>=17.0",
+    "gtfs-realtime-bindings>=1.0",
+    "boto3>=1.35",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.32,<0.12.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# Sensible default set: pyflakes, pycodestyle, isort, pyupgrade, bugbear.
+select = ["E", "F", "I", "UP", "B"]

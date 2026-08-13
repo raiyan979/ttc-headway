@@ -1,0 +1,19 @@
+# Secrets and local runtime config
+.env
+
+# Local data (raw captures, DuckDB files) — never committed
+data/raw/
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db
