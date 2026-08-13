@@ -60,3 +60,12 @@ def test_write_cycle_partitions_on_service_date(tmp_path):
     assert pq.read_table(parquet_path).num_rows == 2
     # The .tmp siblings must not survive an atomic write.
     assert not list(tmp_path.rglob("*.tmp"))
+
+
+def test_write_cycle_with_no_rows_still_writes_raw_insurance(tmp_path):
+    # Fetches succeeded but every decode failed: the raw .pb.gz must still be
+    # written (it is the reprocessing insurance), with a valid 0-row Parquet.
+    started = datetime(2026, 8, 14, 17, 15, tzinfo=TORONTO)
+    parquet_path, pb_path = write_cycle(str(tmp_path), started, [], [b"raw-1", b"raw-2"])
+    assert pb_path.exists()
+    assert pq.read_table(parquet_path).num_rows == 0
