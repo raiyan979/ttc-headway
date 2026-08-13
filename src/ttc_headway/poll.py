@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 
 from .config import Settings
 from .feed import build_session, fetch_feed, parse_vehicles
+from .r2 import upload_paths
 from .service_time import assert_timezone, now_toronto
 from .storage import slot_bounds, write_cycle
 
@@ -73,6 +74,11 @@ def run_cycle(settings: Settings) -> int:
         parquet_path,
         pb_path.name,
     )
+
+    if settings.r2_configured:
+        upload_paths(settings, [parquet_path, pb_path])
+    else:
+        log.info("R2 not configured; kept local only")
     return 0
 
 

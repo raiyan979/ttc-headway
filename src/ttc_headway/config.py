@@ -43,8 +43,18 @@ class Settings(BaseSettings):
     max_response_bytes: int = 20 * 1024 * 1024
 
     # --- Storage ---
-    # Local path for dev, or s3://<bucket> for R2.
+    # The collector always writes here first (local staging). If R2 is
+    # configured, files are then uploaded; otherwise the run stays local-only.
     storage_root: str = "./data/raw"
+    # Bucket/endpoint are not secrets, but the repo is public, so they come
+    # through env vars too rather than into any tracked file.
+    r2_bucket: str | None = None
     r2_endpoint_url: str | None = None
     r2_access_key_id: str | None = None
     r2_secret_access_key: str | None = None
+
+    @property
+    def r2_configured(self) -> bool:
+        return all(
+            (self.r2_bucket, self.r2_endpoint_url, self.r2_access_key_id, self.r2_secret_access_key)
+        )
